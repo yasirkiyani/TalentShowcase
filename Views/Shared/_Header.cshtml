@@ -1,0 +1,65 @@
+@{
+    string? currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+}
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top">
+    <div class="container">
+        <a class="navbar-brand" asp-controller="Home" asp-action="Index">
+            <i class="bi bi-stars"></i> TalentHub
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link @(currentAction == "Index" ? "active" : "")" asp-controller="Home" asp-action="Index"><i class="bi bi-house"></i> Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link @(currentAction == "Explore" ? "active" : "")" asp-controller="Home" asp-action="Explore"><i class="bi bi-compass"></i> Explore</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link @(currentAction == "Upload" ? "active" : "")" asp-controller="Home" asp-action="Upload"><i class="bi bi-cloud-upload"></i> Upload</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link @(currentAction == "Communities" || currentAction == "CommunityOptions" || currentAction == "CommunityView" ? "active" : "")" asp-controller="Home" asp-action="Communities"><i class="bi bi-people"></i> Communities</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link @(currentAction == "Contests" ? "active" : "")" asp-controller="Home" asp-action="Contests"><i class="bi bi-trophy"></i> Contests</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link @(currentAction == "Mentorship" ? "active" : "")" asp-controller="Home" asp-action="Mentorship"><i class="bi bi-person-workspace"></i> Mentorship</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link @(currentAction == "Networking" ? "active" : "")" asp-controller="Home" asp-action="Networking"><i class="bi bi-briefcase"></i> Networking</a>
+                </li>
+                <!-- Logged Out State -->
+                <li class="nav-item" id="loginBtn">
+                    <a class="nav-link @(currentAction == "Login" ? "active" : "")" asp-controller="Home" asp-action="Login"><i class="bi bi-box-arrow-in-right"></i> Login</a>
+                </li>
+                <li class="nav-item" id="registerBtn">
+                    <a class="nav-link @(currentAction == "Register" ? "active" : "")" asp-controller="Home" asp-action="Register"><i class="bi bi-person-plus"></i> Register</a>
+                </li>
+
+                <!-- Logged In State (Hidden by default) -->
+                <li class="nav-item dropdown" id="userDropdown" style="display: none;">
+                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                        <i class="bi bi-person-circle"></i> <span id="userName">User</span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item @(currentAction == "Profile" ? "active" : "")" asp-controller="Home" asp-action="Profile"><i class="bi bi-person-circle"></i> Profile</a></li>
+                        <li><a class="dropdown-item @(currentAction == "Analytics" ? "active" : "")" asp-controller="Home" asp-action="Analytics"><i class="bi bi-graph-up"></i> Analytics</a></li>
+                        <li><a class="dropdown-item" asp-controller="Home" asp-action="Upload"><i class="bi bi-cloud-upload"></i> Upload Video</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#" onclick="logout()"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
+                    </ul>
+                </li>
+            </ul>
+            <form class="d-flex">
+                <input class="form-control me-2" type="search" placeholder="Search talents...">
+                <button class="btn btn-outline-light" type="submit">
+                    <i class="bi bi-search"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+</nav>

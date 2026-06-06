@@ -1,0 +1,291 @@
+@model NewTalent.Models.VideoUploadViewModel
+@{
+    ViewData["Title"] = "Upload Video";
+}
+
+<!-- Upload Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="text-center mb-5">
+                    <h2 class="display-5 fw-bold">Upload Your Talent</h2>
+                    <p class="lead text-muted">Share your skills with the world and get discovered</p>
+                </div>
+
+                <!-- Upload Form -->
+                <div class="card shadow-sm">
+                    <div class="card-body p-4">
+                        @if (!ViewData.ModelState.IsValid)
+                        {
+                            <div class="alert alert-danger">
+                                <ul>
+                                    @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                                    {
+                                        <li>@error.ErrorMessage</li>
+                                    }
+                                </ul>
+                            </div>
+                        }
+
+                        <form asp-controller="Talent" asp-action="Upload" method="post" enctype="multipart/form-data">
+                            <!-- Upload Area -->
+                            <div class="upload-area mb-4" id="uploadArea">
+                                <i class="bi bi-cloud-upload display-1 text-primary mb-3"></i>
+                                <h4>Drag & Drop your video here</h4>
+                                <p class="text-muted mb-3">or click to browse from your computer</p>
+                                <button type="button" class="btn btn-outline-primary" onclick="document.getElementById('VideoFile').click()">
+                                    <i class="bi bi-folder2-open"></i> Choose File
+                                </button>
+                                <input type="file" asp-for="VideoFile" accept=".mp4,.avi,.mov,.wmv,.webm,.mkv,.flv" style="display: none;" id="VideoFile">
+                                <span asp-validation-for="VideoFile" class="text-danger"></span>
+                                <p class="text-muted small mt-3">Supported formats: MP4, AVI, MOV, WMV, WebM, MKV, FLV (Max 500MB)</p>
+                            </div>
+
+                            <!-- File List -->
+                            <div class="file-list mb-4" id="fileList"></div>
+
+                            <!-- Progress Bar -->
+                            <div class="upload-progress mb-4" id="uploadProgress" style="display: none;">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Uploading...</span>
+                                    <span id="progressPercent">0%</span>
+                                </div>
+                                <div class="progress-custom">
+                                    <div class="progress-bar-custom" id="progressBar" style="width: 0%"></div>
+                                </div>
+                            </div>
+
+                            <!-- Video Details -->
+                            <div class="video-details" id="videoDetails" style="display: none;">
+                                <hr>
+                                <h5 class="mb-4">Video Details</h5>
+                                
+                                <div class="mb-3">
+                                    <label asp-for="Title" class="form-label">Video Title *</label>
+                                    <input asp-for="Title" class="form-control" placeholder="Enter a catchy title for your video" required>
+                                    <span asp-validation-for="Title" class="text-danger"></span>
+                                    <div class="form-text">Make it engaging and descriptive</div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label asp-for="Description" class="form-label">Description *</label>
+                                    <textarea asp-for="Description" class="form-control" rows="4" placeholder="Describe your performance, what inspired you, or any special techniques you used" required></textarea>
+                                    <span asp-validation-for="Description" class="text-danger"></span>
+                                    <div class="form-text">Tell viewers what makes your performance special</div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label asp-for="Category" class="form-label">Category *</label>
+                                        <select asp-for="Category" class="form-select" required>
+                                            <option value="">Select a category</option>
+                                            <option value="music">Music</option>
+                                            <option value="dance">Dance</option>
+                                            <option value="art">Art</option>
+                                            <option value="acting">Acting</option>
+                                            <option value="coding">Coding</option>
+                                            <option value="writing">Writing</option>
+                                            <option value="comedy">Comedy</option>
+                                            <option value="sports">Sports</option>
+                                            <option value="cooking">Cooking</option>
+                                            <option value="magic">Magic</option>
+                                            <option value="other">Other</option>
+                                        </select>
+                                        <span asp-validation-for="Category" class="text-danger"></span>
+                                    </div>
+
+                                    <div class="col-md-6 mb-3">
+                                        <label asp-for="SkillLevel" class="form-label">Skill Level</label>
+                                        <select asp-for="SkillLevel" class="form-select">
+                                            <option value="beginner">Beginner</option>
+                                            <option value="intermediate">Intermediate</option>
+                                            <option value="advanced">Advanced</option>
+                                            <option value="professional">Professional</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label asp-for="VideoType" class="form-label">Video Type</label>
+                                    <select asp-for="VideoType" class="form-select">
+                                        <option value="performance">Performance</option>
+                                        <option value="tutorial">Tutorial</option>
+                                        <option value="exhibition">Exhibition</option>
+                                        <option value="behind_the_scenes">Behind the Scenes</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                    <div class="form-text">Select the type of video content</div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label asp-for="Tags" class="form-label">Tags</label>
+                                    <input asp-for="Tags" class="form-control" placeholder="Enter tags separated by commas (e.g., guitar, blues, original)">
+                                    <div class="form-text">Add relevant tags to help others discover your content</div>
+                                </div>
+
+                                <!-- Privacy Settings -->
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Privacy Settings</label>
+                                    <div class="card bg-light">
+                                        <div class="card-body py-2">
+                                            <div class="mb-2">
+                                                <label asp-for="Privacy" class="form-label small">Visibility</label>
+                                                <select asp-for="Privacy" class="form-select form-select-sm">
+                                                    <option value="public">Public - Anyone can see</option>
+                                                    <option value="unlisted">Unlisted - Only with link</option>
+                                                    <option value="private">Private - Only you</option>
+                                                </select>
+                                            </div>
+                                            <div class="form-check form-check-sm">
+                                                <input class="form-check-input" asp-for="AllowComments" checked>
+                                                <label class="form-check-label small" asp-for="AllowComments">Allow Comments</label>
+                                            </div>
+                                            <div class="form-check form-check-sm">
+                                                <input class="form-check-input" asp-for="AllowLikes" checked>
+                                                <label class="form-check-label small" asp-for="AllowLikes">Allow Likes</label>
+                                            </div>
+                                            <div class="form-check form-check-sm">
+                                                <input class="form-check-input" asp-for="AllowShares" checked>
+                                                <label class="form-check-label small" asp-for="AllowShares">Allow Shares</label>
+                                            </div>
+                                            <div class="form-check form-check-sm">
+                                                <input class="form-check-input" asp-for="AllowDownloads">
+                                                <label class="form-check-label small" asp-for="AllowDownloads">Allow Downloads</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Submit Buttons -->
+                                <div class="d-flex justify-content-between">
+                                    <a asp-action="Explore" class="btn btn-secondary">
+                                        <i class="bi bi-x-circle"></i> Cancel
+                                    </a>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="bi bi-upload"></i> Upload Video
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Upload Guidelines -->
+                <div class="card mt-4">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">
+                            <i class="bi bi-info-circle text-primary"></i> Upload Guidelines
+                        </h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Video Requirements</h6>
+                                <ul class="small">
+                                    <li>Maximum file size: 500MB</li>
+                                    <li>Supported formats: MP4, AVI, MOV, WMV, WebM, MKV, FLV</li>
+                                    <li>Recommended resolution: 1080p or higher</li>
+                                    <li>Aspect ratio: 16:9 (horizontal) or 9:16 (vertical)</li>
+                                    <li>Frame rate: 24-60 fps</li>
+                                    <li>Video types: Performance, Tutorial, Exhibition, Behind the Scenes</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Content Guidelines</h6>
+                                <ul class="small">
+                                    <li>Original content only</li>
+                                    <li>No copyrighted material without permission</li>
+                                    <li>Family-friendly content recommended</li>
+                                    <li>High audio and video quality</li>
+                                    <li>Clear and well-lit footage</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Success Modal -->
+<div class="modal fade" id="successModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body text-center py-5">
+                <i class="bi bi-check-circle-fill text-success display-1 mb-3"></i>
+                <h4>Upload Successful!</h4>
+                <p class="text-muted">Your video has been uploaded successfully and is now being processed.</p>
+                <div class="d-flex justify-content-center gap-2 mt-4">
+                    <a class="btn btn-primary" asp-controller="Home" asp-action="Profile">
+                        <i class="bi bi-person-circle"></i> View My Videos
+                    </a>
+                    <button type="button" class="btn btn-outline-primary" onclick="resetForm(); bootstrap.Modal.getInstance(document.getElementById('successModal')).hide();">
+                        <i class="bi bi-plus-circle"></i> Upload Another
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // File input handling
+        document.getElementById('VideoFile').addEventListener('change', function(e) {
+            handleFiles(e.target.files);
+        });
+
+        // Enhanced file handling for upload page
+        function handleFiles(files) {
+            if (files.length > 0) {
+                const file = files[0];
+                
+                // Validate file type
+                const validTypes = ['video/mp4', 'video/avi', 'video/mov', 'video/wmv', 'video/x-msvideo', 'video/quicktime'];
+                if (!validTypes.includes(file.type)) {
+                    alert('Please select a valid video file (MP4, AVI, MOV, WMV)');
+                    return;
+                }
+                
+                // Validate file size (500MB)
+                const maxSize = 500 * 1024 * 1024;
+                if (file.size > maxSize) {
+                    alert('File size must be less than 500MB');
+                    return;
+                }
+                
+                // Display file info
+                const fileList = document.getElementById('fileList');
+                fileList.innerHTML = `
+                    <div class="alert alert-info d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="bi bi-file-earmark-play me-2"></i>
+                            <strong>${file.name}</strong>
+                            <span class="text-muted ms-2">(${formatFileSize(file.size)})</span>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeFile()">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                `;
+                
+                // Show video details section
+                document.getElementById('videoDetails').style.display = 'block';
+            }
+        }
+
+        function removeFile() {
+            document.getElementById('fileList').innerHTML = '';
+            document.getElementById('videoDetails').style.display = 'none';
+            document.getElementById('VideoFile').value = '';
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+    </script>
+}

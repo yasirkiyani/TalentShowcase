@@ -1,0 +1,166 @@
+@model NewTalent.Models.RegisterViewModel
+
+@{
+    ViewData["Title"] = "Register";
+}
+
+<link rel="stylesheet" href="~/css/style.css" />
+
+<style>
+    .profile-pic {
+        width: 130px;
+        height: 130px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid #ddd;
+    }
+
+    .card-box {
+        background: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.08);
+    }
+</style>
+
+<div class="container mt-5">
+
+    <h2 class="text-center mb-4">Create Account</h2>
+
+    <form asp-action="Register"
+          asp-controller="Talent"
+          method="post"
+          enctype="multipart/form-data">
+
+        <div class="row">
+
+            <!-- LEFT SIDE -->
+            <div class="col-md-6">
+
+                <div class="card-box">
+
+                    <h5>Profile Picture</h5>
+
+                    <div class="text-center mb-3">
+
+                        <label for="ProfilePicture" style="cursor:pointer;">
+                            <img id="imgPreview"
+                                 src="https://via.placeholder.com/130"
+                                 class="profile-pic" />
+                        </label>
+
+                        <input asp-for="ProfilePicture"
+                               type="file"
+                               id="ProfilePicture"
+                               class="d-none"
+                               accept="image/*"
+                               onchange="previewImage(event)" />
+
+                        <div>
+                            <small class="text-muted">Click image to upload</small>
+                        </div>
+
+                    </div>
+
+                    <h5>Basic Info</h5>
+
+                    <input asp-for="FirstName" class="form-control mb-2" placeholder="First Name" />
+                    <span asp-validation-for="FirstName" class="text-danger"></span>
+
+                    <input asp-for="LastName" class="form-control mb-2" placeholder="Last Name" />
+                    <span asp-validation-for="LastName" class="text-danger"></span>
+
+                    <input asp-for="Email" class="form-control mb-2" placeholder="Email" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+
+                    <input asp-for="Username" class="form-control mb-2" placeholder="Username" />
+                    <span asp-validation-for="Username" class="text-danger"></span>
+
+                    <input asp-for="Password" type="password" class="form-control mb-2" placeholder="Password" />
+                    <span asp-validation-for="Password" class="text-danger"></span>
+
+                    <input asp-for="ConfirmPassword" type="password" class="form-control mb-2" placeholder="Confirm Password" />
+                    <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+
+                </div>
+
+            </div>
+
+            <!-- RIGHT SIDE -->
+            <div class="col-md-6">
+
+                <div class="card-box">
+
+                    <h5>Profile Info</h5>
+
+                    <textarea asp-for="Bio" class="form-control mb-2" placeholder="Bio"></textarea>
+
+                    <input asp-for="Location" class="form-control mb-2" placeholder="Location" />
+
+                    <input asp-for="Website" class="form-control mb-2" placeholder="Website" />
+
+                    <h5>Talents</h5>
+
+                    <div class="row mb-3">
+
+                        @foreach (var t in Model.AvailableTalents)
+                        {
+                            <div class="col-6">
+                                <label>
+                                    <input type="checkbox"
+                                           name="SelectedTalents"
+                                           value="@t" />
+                                    @t
+                                </label>
+                            </div>
+                        }
+
+                    </div>
+
+                    <h5>Settings</h5>
+
+                    <div class="form-check">
+                        <input asp-for="PublicProfile" class="form-check-input" />
+                        <label class="form-check-label">Public Profile</label>
+                    </div>
+
+                    <div class="form-check">
+                        <input asp-for="ShowEmail" class="form-check-input" />
+                        <label class="form-check-label">Show Email</label>
+                    </div>
+
+                    <div class="form-check mt-2">
+                        <input asp-for="AgreeToTerms" class="form-check-input" />
+                        <label class="form-check-label">I agree to terms</label>
+                        <span asp-validation-for="AgreeToTerms" class="text-danger"></span>
+                    </div>
+
+                    <button type="submit" class="btn btn-success mt-3 w-100">
+                        Create Account
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </form>
+</div>
+
+<script>
+    function previewImage(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            document.getElementById("imgPreview").src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+</script>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

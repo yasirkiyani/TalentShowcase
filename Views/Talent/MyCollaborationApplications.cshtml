@@ -1,0 +1,58 @@
+@model List<NewTalent.Data.Entities.CollaborationApplication>
+@{
+    ViewData["Title"] = "My Collaboration Applications";
+}
+
+<!-- HERO SECTION -->
+<section class="hero-section text-white">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6 fade-in">
+                <h1 class="display-4 fw-bold">My Collaboration Applications</h1>
+                <p class="lead">Track your applications to join collaboration projects.</p>
+            </div>
+            <div class="col-lg-6 text-center hero-image">
+                <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&h=600&fit=crop" class="img-fluid rounded-4 shadow-lg" alt="My Applications" />
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="container py-4">
+    @if (Model.Any())
+    {
+        <div class="row">
+            @foreach (var application in Model)
+            {
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div>
+                                    <h5 class="card-title">@application.Collaboration.Title</h5>
+                                    <p class="card-text text-muted mb-2">by @application.Collaboration.Creator.Username</p>
+                                </div>
+                                <span class="badge @(application.Status == "accepted" ? "bg-success" : application.Status == "rejected" ? "bg-danger" : "bg-warning")">@application.Status</span>
+                            </div>
+                            <p class="card-text small">@application.Collaboration.Description.Substring(0, Math.Min(150, application.Collaboration.Description.Length))...</p>
+                            @if (!string.IsNullOrEmpty(application.Message))
+                            {
+                                <p class="card-text small text-muted"><strong>Your Message:</strong> @application.Message</p>
+                            }
+                            <p class="card-text small text-muted">Applied on @application.AppliedAt.ToString("MMM dd, yyyy")</p>
+                            <a href="/Talent/Collaborations" class="btn btn-sm btn-outline-primary">View All Collaborations</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info">
+            <h4 class="alert-heading">No Applications Yet</h4>
+            <p>You haven't applied to any collaborations yet. Browse available collaborations to find opportunities!</p>
+            <a href="/Talent/Collaborations" class="btn btn-primary">Browse Collaborations</a>
+        </div>
+    }
+</div>

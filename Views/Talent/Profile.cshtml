@@ -1,0 +1,198 @@
+@model NewTalent.Models.ProfileViewModel
+
+@{
+    ViewData["Title"] = $"{Model.FullName}'s Profile";
+}
+
+<div class="container py-5">
+    <!-- Profile Header -->
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <div class="row align-items-center">
+                <div class="col-md-3 text-center">
+                    <img src="@Model.ProfilePicture" alt="@Model.FullName" class="rounded-circle profile-pic-large mb-3" width="150" height="150" />
+                </div>
+                <div class="col-md-6">
+                    <h1 class="mb-2">@Model.FullName</h1>
+                    <p class="text-muted mb-2">@@@Model.Username</p>
+                    @if (!string.IsNullOrEmpty(Model.Bio))
+                    {
+                        <p class="mb-2">@Model.Bio</p>
+                    }
+                    <div class="mb-2">
+                        @if (!string.IsNullOrEmpty(Model.Location))
+                        {
+                            <span class="me-3"><i class="bi bi-geo-alt"></i> @Model.Location</span>
+                        }
+                        @if (!string.IsNullOrEmpty(Model.Website))
+                        {
+                            <span class="me-3"><i class="bi bi-globe"></i> <a href="@Model.Website" target="_blank">@Model.Website</a></span>
+                        }
+                        @if (Model.ShowEmail && !string.IsNullOrEmpty(Model.Email))
+                        {
+                            <span class="me-3"><i class="bi bi-envelope"></i> @Model.Email</span>
+                        }
+                    </div>
+                    @if (Model.IsOwnProfile)
+                    {
+                        <a asp-action="EditProfile" class="btn btn-primary mt-2">Edit Profile</a>
+                    }
+                    else if (Model.AllowMessages)
+                    {
+                        <a href="/Talent/Messages" class="btn btn-outline-primary mt-2">Send Message</a>
+                    }
+                </div>
+                <div class="col-md-3 text-center">
+                    @if (Model.ShowStats)
+                    {
+                        <div class="row">
+                            <div class="col-4 mb-2">
+                                <div class="h4 mb-0">@Model.VideosCount</div>
+                                <small class="text-muted">Videos</small>
+                            </div>
+                            <div class="col-4 mb-2">
+                                <div class="h4 mb-0">@Model.FollowersCount</div>
+                                <small class="text-muted">Followers</small>
+                            </div>
+                            <div class="col-4 mb-2">
+                                <div class="h4 mb-0">@Model.FollowingCount</div>
+                                <small class="text-muted">Following</small>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Talents Section -->
+    @if (!string.IsNullOrEmpty(Model.SelectedTalents))
+    {
+        <div class="card shadow mb-4">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">Talents & Skills</h4>
+            </div>
+            <div class="card-body">
+                <div class="d-flex flex-wrap gap-2">
+                    @foreach (var talent in Model.SelectedTalents.Split(','))
+                    {
+                        <span class="badge bg-secondary fs-6">@talent.Trim()</span>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Achievements Section -->
+    @if (Model.Achievements != null && Model.Achievements.Any())
+    {
+        <div class="card shadow mb-4">
+            <div class="card-header bg-warning text-dark">
+                <h4 class="mb-0">🏆 Achievements</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    @foreach (var achievement in Model.Achievements)
+                    {
+                        <div class="col-md-6 mb-3">
+                            <div class="card achievement-card">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-start">
+                                        <div class="me-3">
+                                            <i class="@achievement.IconClass @achievement.BadgeColor display-4"></i>
+                                        </div>
+                                        <div>
+                                            <h5 class="card-title">@achievement.Title</h5>
+                                            <p class="card-text small text-muted">@achievement.Description</p>
+                                            <small class="text-muted">Awarded on @achievement.DateAwarded.ToString("MMMM dd, yyyy")</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Videos Section -->
+    @if (Model.Videos != null && Model.Videos.Any())
+    {
+        <div class="card shadow mb-4">
+            <div class="card-header bg-success text-white">
+                <h4 class="mb-0">🎬 Videos</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    @foreach (var video in Model.Videos)
+                    {
+                        <div class="col-md-4 mb-3">
+                            <div class="card talent-card">
+                                <div class="position-relative">
+                                    <video class="card-img-top" poster="@video.ThumbnailUrl" style="max-height: 200px; cursor: pointer;">
+                                        <source src="@video.VideoUrl" type="video/mp4">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                    <div class="position-absolute top-50 start-50 translate-middle">
+                                        <i class="bi bi-play-circle-fill text-white display-1" style="opacity: 0.8;"></i>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <h5 class="card-title">@video.Title</h5>
+                                    <p class="card-text small text-muted">@video.Description</p>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Contact Information -->
+    @if (!string.IsNullOrEmpty(Model.Phone) || !string.IsNullOrEmpty(Model.Website))
+    {
+        <div class="card shadow mb-4">
+            <div class="card-header bg-info text-white">
+                <h4 class="mb-0">📞 Contact Information</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    @if (!string.IsNullOrEmpty(Model.Phone))
+                    {
+                        <div class="col-md-6 mb-2">
+                            <strong><i class="bi bi-telephone"></i> Phone:</strong> @Model.Phone
+                        </div>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.Website))
+                    {
+                        <div class="col-md-6 mb-2">
+                            <strong><i class="bi bi-globe"></i> Website:</strong> <a href="@Model.Website" target="_blank">@Model.Website</a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Privacy Notice -->
+    @if (!Model.PublicProfile)
+    {
+        <div class="alert alert-warning">
+            <i class="bi bi-exclamation-triangle"></i> This profile is set to private. Some information may not be visible to all users.
+        </div>
+    }
+</div>
+
+@section Styles {
+    <style>
+        .profile-pic-large {
+            border: 4px solid #fff;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .achievement-card {
+            border-left: 4px solid #ffc107;
+        }
+    </style>
+}

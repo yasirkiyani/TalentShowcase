@@ -1,0 +1,71 @@
+@model List<NewTalent.Data.Entities.TalentScoutProfile>
+@{
+    ViewData["Title"] = "Talent Scouts";
+    var isLoggedIn = Context.Session.GetString("UserEmail") != null;
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>🎯 Talent Scouts</h1>
+        @if (isLoggedIn)
+        {
+            <a href="/Talent/ScoutProfiles" class="btn btn-primary">Create Scout Profile</a>
+        }
+    </div>
+
+    @if (Model.Count == 0)
+    {
+        <div class="alert alert-info">
+            No talent scout profiles found yet.
+        </div>
+    }
+    else
+    {
+        <div class="row g-4">
+            @foreach (var scout in Model)
+            {
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <div class="d-flex align-items-start mb-3">
+                                <img src="@(string.IsNullOrEmpty(scout.User.ProfilePicture) ? "https://via.placeholder.com/60" : scout.User.ProfilePicture)"
+                                     alt="@scout.User.Username" class="rounded-circle me-3" width="60" height="60">
+                                <div class="flex-grow-1">
+                                    <h5 class="card-title mb-1">@scout.Title</h5>
+                                    <p class="text-muted small mb-1">@scout.CompanyName</p>
+                                    @if (scout.IsVerified)
+                                    {
+                                        <span class="badge bg-success">✓ Verified</span>
+                                    }
+                                </div>
+                            </div>
+                            <p class="card-text small">@scout.Bio</p>
+                            @if (!string.IsNullOrEmpty(scout.Industry))
+                            {
+                                <div class="mb-2">
+                                    <span class="badge bg-primary">@scout.Industry</span>
+                                </div>
+                            }
+                            @if (!string.IsNullOrEmpty(scout.Specializations))
+                            {
+                                <div class="mb-2">
+                                    @foreach (var spec in scout.Specializations.Split(',').Take(3))
+                                    {
+                                        <span class="badge bg-secondary me-1">@spec.Trim()</span>
+                                    }
+                                </div>
+                            }
+                            <div class="mb-2">
+                                <small class="text-muted">
+                                    <strong>Jobs Posted:</strong> @scout.TotalJobsPosted<br>
+                                    <strong>Total Hires:</strong> @scout.TotalHires
+                                </small>
+                            </div>
+                            <a href="/Talent/Jobs" class="btn btn-sm btn-primary">View Jobs</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

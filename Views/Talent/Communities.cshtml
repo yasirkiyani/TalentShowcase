@@ -1,0 +1,538 @@
+@model NewTalent.Models.CommunitiesPageViewModel
+@{
+    ViewData["Title"] = "Communities";
+}
+
+<!-- HERO SECTION -->
+<section class="hero-section text-white">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6 fade-in">
+                <h1 class="display-4 fw-bold">Join Talent Communities</h1>
+                <p class="lead">Connect with like-minded individuals, share your passion, and grow together in supportive communities. Find your tribe and collaborate with talented people from around the world.</p>
+                <div class="mt-4">
+                    <button class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#createCommunityModal">
+                        <i class="bi bi-plus-circle"></i> Create Community
+                    </button>
+                    <button class="btn btn-outline-primary" onclick="scrollToExplore()">
+                        <i class="bi bi-compass"></i> Explore Communities
+                    </button>
+                </div>
+            </div>
+            <div class="col-lg-6 text-center hero-image">
+                <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&h=600&fit=crop" class="img-fluid rounded-4 shadow-lg" alt="Communities" />
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- My Communities Section -->
+@if (Model.MyCommunities != null && Model.MyCommunities.Any())
+{
+    <section class="py-5 bg-light">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="display-6 fw-bold">My Communities</h2>
+                <a href="#" class="btn btn-outline-primary">View All</a>
+            </div>
+
+            <div class="row g-4">
+                @foreach (var community in Model.MyCommunities)
+                {
+                    <div class="col-md-6 col-lg-3">
+                        <div class="card community-card">
+                            <div class="card-body text-center">
+                                <div class="community-icon mb-3">
+                                    <img src="@(string.IsNullOrEmpty(community.ImageUrl) ? "https://via.placeholder.com/80" : community.ImageUrl)" alt="Community" class="rounded-circle">
+                                </div>
+                                <h5 class="card-title">@community.Name</h5>
+                                <p class="card-text small text-muted">@(community.Description.Length > 50 ? community.Description.Substring(0, 50) + "..." : community.Description)</p>
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <span class="badge bg-primary">@community.MembersCount members</span>
+                                    <span class="badge @((community.Status == "Active") ? "bg-success" : "bg-warning")">@community.Status</span>
+                                </div>
+                                <div class="btn-group w-100" role="group">
+                                    <button class="btn btn-sm btn-outline-info" onclick="viewCommunityDetails(@community.Id)">
+                                        <i class="bi bi-info-circle"></i> Details
+                                    </button>
+                                    <a class="btn btn-sm btn-outline-primary" asp-controller="Talent" asp-action="CommunityView" asp-route-id="@community.Id">View</a>
+                                    @if (community.IsAdmin)
+                                    {
+                                        <a class="btn btn-sm btn-primary" asp-controller="Talent" asp-action="CommunityOptions" asp-route-id="@community.Id">Options</a>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+}
+
+<!-- Explore Communities Section -->
+<section class="py-5" id="exploreSection">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="display-6 fw-bold">Explore Communities</h2>
+            <div class="d-flex gap-2">
+                <select class="form-select form-select-sm" style="width: auto;">
+                    <option>All Categories</option>
+                    <option>Music</option>
+                    <option>Dance</option>
+                    <option>Art</option>
+                    <option>Acting</option>
+                    <option>Coding</option>
+                    <option>Writing</option>
+                </select>
+                <select class="form-select form-select-sm" style="width: auto;">
+                    <option>Most Popular</option>
+                    <option>Newest</option>
+                    <option>Most Active</option>
+                    <option>Most Members</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            @foreach (var community in Model.AllCommunities)
+            {
+                <div class="col-md-6 col-lg-4">
+                    <div class="card community-card h-100">
+                        <div class="card-body">
+                            <div class="d-flex align-items-start mb-3">
+                                <img src="@(string.IsNullOrEmpty(community.ImageUrl) ? "https://via.placeholder.com/60" : community.ImageUrl)" alt="Community" class="rounded-circle me-3" width="60" height="60">
+                                <div class="flex-grow-1">
+                                    <h5 class="card-title mb-1">@community.Name</h5>
+                                    <p class="text-muted small mb-2">@community.Category</p>
+                                    <div class="d-flex gap-2 mb-2">
+                                        <span class="badge bg-primary">@community.MembersCount members</span>
+                                        <span class="badge @((community.Status == "Active") ? "bg-success" : "bg-warning")">@community.Status</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="card-text">@(community.Description.Length > 100 ? community.Description.Substring(0, 100) + "..." : community.Description)</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="text-muted small">
+                                    <span><i class="bi bi-chat-dots"></i> @community.PostsToday posts today</span>
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-outline-info btn-sm" onclick="viewCommunityDetails(@community.Id)">
+                                        <i class="bi bi-info-circle"></i> Details
+                                    </button>
+                                    @if (community.IsJoined)
+                                    {
+                                        <button class="btn btn-success btn-sm" disabled>
+                                            <i class="bi bi-check-circle"></i> Joined
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <button class="btn btn-primary btn-sm" onclick="joinCommunity(@community.Id)">
+                                            <i class="bi bi-plus-circle"></i> Join
+                                        </button>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<!-- Community Features Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="display-6 fw-bold">Community Features</h2>
+            <p class="lead text-muted">Everything you need to build and engage with your community</p>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-3">
+                <div class="text-center">
+                    <div class="feature-icon text-primary mb-3">
+                        <i class="bi bi-chat-square-text display-4"></i>
+                    </div>
+                    <h5>Discussion Boards</h5>
+                    <p class="text-muted">Organized discussions on various topics within your community</p>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-3">
+                <div class="text-center">
+                    <div class="feature-icon text-success mb-3">
+                        <i class="bi bi-calendar-event display-4"></i>
+                    </div>
+                    <h5>Community Events</h5>
+                    <p class="text-muted">Organize virtual meetups, workshops, and collaborative projects</p>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-3">
+                <div class="text-center">
+                    <div class="feature-icon text-warning mb-3">
+                        <i class="bi bi-trophy display-4"></i>
+                    </div>
+                    <h5>Challenges</h5>
+                    <p class="text-muted">Community-specific challenges and competitions to showcase skills</p>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-3">
+                <div class="text-center">
+                    <div class="feature-icon text-info mb-3">
+                        <i class="bi bi-people display-4"></i>
+                    </div>
+                    <h5>Networking</h5>
+                    <p class="text-muted">Connect with members who share similar interests and goals</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Create Community Modal -->
+<div class="modal fade" id="createCommunityModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Create New Community</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="createCommunityForm">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="mb-3">
+                                <label for="communityName" class="form-label">Community Name *</label>
+                                <input type="text" class="form-control" id="communityName" placeholder="Enter community name" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="communityDescription" class="form-label">Description *</label>
+                                <textarea class="form-control" id="communityDescription" rows="3" placeholder="Describe your community" required></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="communityCategory" class="form-label">Category *</label>
+                                <select class="form-select" id="communityCategory" required>
+                                    <option value="">Select category</option>
+                                    <option value="music">Music</option>
+                                    <option value="dance">Dance</option>
+                                    <option value="art">Art</option>
+                                    <option value="acting">Acting</option>
+                                    <option value="coding">Coding</option>
+                                    <option value="writing">Writing</option>
+                                    <option value="comedy">Comedy</option>
+                                    <option value="sports">Sports</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="communityRules" class="form-label">Community Rules</label>
+                                <textarea class="form-control" id="communityRules" rows="3" placeholder="Set community guidelines and rules"></textarea>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="communityImage" class="form-label">Community Image</label>
+                                <div class="upload-area-small text-center p-3 border rounded">
+                                    <i class="bi bi-image display-4 text-muted"></i>
+                                    <p class="small text-muted mt-2">Click to upload</p>
+                                    <input type="file" id="communityImage" accept="image/*" style="display: none;">
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Privacy Settings</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="privacy" id="publicComm" value="public" checked>
+                                    <label class="form-check-label" for="publicComm">
+                                        <strong>Public</strong> - Anyone can join
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="privacy" id="privateComm" value="private">
+                                    <label class="form-check-label" for="privateComm">
+                                        <strong>Private</strong> - Approval required
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="allowPosts" checked>
+                                    <label class="form-check-label" for="allowPosts">
+                                        Allow member posts
+                                    </label>
+                                </div>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="allowEvents" checked>
+                                    <label class="form-check-label" for="allowEvents">
+                                        Allow community events
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="createCommunity()">Create Community</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Join Community Modal -->
+<div class="modal fade" id="joinCommunityModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Join Community</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to join this community?</p>
+                <input type="hidden" id="joinCommunityId" value="">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="confirmJoinCommunity()">Join</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Community Details Modal -->
+<div class="modal fade" id="communityDetailsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Community Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="communityDetailsContent">
+                    <!-- Content will be loaded dynamically -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Scroll to explore section
+        function scrollToExplore() {
+            document.getElementById('exploreSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Join community (open modal)
+        function joinCommunity(communityId) {
+            document.getElementById('joinCommunityId').value = communityId;
+            const joinCommunityModal = new bootstrap.Modal(document.getElementById('joinCommunityModal'));
+            joinCommunityModal.show();
+        }
+
+        // Confirm join community (AJAX call to backend)
+        function confirmJoinCommunity() {
+            const communityId = document.getElementById('joinCommunityId').value;
+
+            if (!communityId) {
+                alert('Community ID is missing');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('communityId', communityId);
+
+            fetch('/Talent/JoinCommunity', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(text => {
+                try {
+                    const data = JSON.parse(text);
+                    if (data.success) {
+                        bootstrap.Modal.getInstance(document.getElementById('joinCommunityModal')).hide();
+                        alert('Successfully joined the community!');
+                        location.reload();
+                    } else {
+                        alert(data.message || 'Failed to join community');
+                    }
+                } catch (e) {
+                    console.error('Response is not JSON:', text);
+                    alert('Server error: ' + text.substring(0, 200));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred: ' + error.message);
+            });
+        }
+
+        // View community details
+        function viewCommunityDetails(communityId) {
+            fetch(`/Talent/GetCommunityDetails?communityId=${communityId}`)
+                .then(response => response.text())
+                .then(text => {
+                    try {
+                        const data = JSON.parse(text);
+                        if (data.success) {
+                            const community = data.community;
+                            let detailsHtml = `
+                                <div class="row">
+                                    <div class="col-md-4 text-center">
+                                        <img src="${community.imageUrl || 'https://via.placeholder.com/150'}" class="rounded-circle mb-3" width="150" height="150">
+                                    </div>
+                                    <div class="col-md-8">
+                                        <h5>${community.name}</h5>
+                                        <p><strong>Description:</strong> ${community.description}</p>
+                                        <p><strong>Category:</strong> ${community.category}</p>
+                                        <p><strong>Privacy:</strong> ${community.privacy}</p>
+                                        <p><strong>Members:</strong> ${community.membersCount}</p>
+                                        <p><strong>Created by:</strong> ${community.creator.username}</p>
+                                    </div>
+                                </div>
+                                <hr>
+                                <h6>Members List:</h6>
+                            `;
+
+                            if (data.members && data.members.length > 0) {
+                                data.members.forEach(m => {
+                                    detailsHtml += `
+                                        <div class="d-flex align-items-center mb-2">
+                                            <img src="${m.profilePicture || 'https://via.placeholder.com/40'}" class="rounded-circle me-2" width="40" height="40">
+                                            <div>
+                                                <strong>${m.username}</strong><br>
+                                                <small class="text-muted">${m.role || 'Member'}</small>
+                                            </div>
+                                        </div>
+                                    `;
+                                });
+                            } else {
+                                detailsHtml += '<p>No members yet.</p>';
+                            }
+
+                            document.getElementById('communityDetailsContent').innerHTML = detailsHtml;
+                            const communityDetailsModal = new bootstrap.Modal(document.getElementById('communityDetailsModal'));
+                            communityDetailsModal.show();
+                        } else {
+                            alert(data.message || 'Failed to load community details');
+                        }
+                    } catch (e) {
+                        console.error('Response is not JSON:', text);
+                        alert('Server error: ' + text.substring(0, 200));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred: ' + error.message);
+                });
+        }
+
+        // Create community (AJAX call to backend)
+        function createCommunity() {
+            const name = document.getElementById('communityName').value;
+            const description = document.getElementById('communityDescription').value;
+            const category = document.getElementById('communityCategory').value;
+            const privacy = document.querySelector('input[name="privacy"]:checked')?.value || 'public';
+            const allowPosts = document.getElementById('allowPosts').checked;
+            const allowEvents = document.getElementById('allowEvents').checked;
+            const rules = document.getElementById('communityRules').value;
+
+            if (!name || !description || !category) {
+                alert('Please fill in all required fields');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('Name', name);
+            formData.append('Description', description);
+            formData.append('Category', category);
+            formData.append('Privacy', privacy);
+            formData.append('AllowPosts', allowPosts);
+            formData.append('AllowEvents', allowEvents);
+            formData.append('Rules', rules);
+
+            const imageFile = document.getElementById('communityImage').files[0];
+            if (imageFile) {
+                formData.append('ImageFile', imageFile);
+            }
+
+            fetch('/Talent/CreateCommunity', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(text => {
+                try {
+                    const data = JSON.parse(text);
+                    if (data.success) {
+                        bootstrap.Modal.getInstance(document.getElementById('createCommunityModal')).hide();
+                        alert(`Community "${name}" created successfully!`);
+                        document.getElementById('createCommunityForm').reset();
+                        location.reload();
+                    } else {
+                        alert(data.message || 'Failed to create community');
+                    }
+                } catch (e) {
+                    console.error('Response is not JSON:', text);
+                    alert('Server error: ' + text.substring(0, 200));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred: ' + error.message);
+            });
+        }
+
+        // Handle community image upload
+        document.querySelector('.upload-area-small').addEventListener('click', function() {
+            document.getElementById('communityImage').click();
+        });
+
+        document.getElementById('communityImage').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.querySelector('.upload-area-small').innerHTML = `
+                        <img src="${e.target.result}" alt="Preview" class="img-fluid rounded" style="max-height: 150px;">
+                        <p class="small text-muted mt-2">Click to change</p>
+                    `;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Add spin animation
+        const style = document.createElement('style');
+        style.textContent = `
+            .spin {
+                animation: spin 1s linear infinite;
+            }
+
+            @@keyframes spin {
+                from { transform: rotate(0deg); }
+                to { transform: rotate(360deg); }
+            }
+
+            .upload-area-small {
+                cursor: pointer;
+                transition: all 0.3s ease;
+            }
+
+            .upload-area-small:hover {
+                background-color: #f8f9fa;
+                border-color: #667eea;
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+}

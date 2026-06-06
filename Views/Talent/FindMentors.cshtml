@@ -1,0 +1,115 @@
+@model List<NewTalent.Data.Entities.MentorshipProfile>
+@{
+    ViewData["Title"] = "Find Mentors";
+    var isLoggedIn = Context.Session.GetString("UserEmail") != null;
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>🎓 Find Mentors</h1>
+        @if (isLoggedIn)
+        {
+            <a href="/Talent/FindMentors" class="btn btn-primary">Become a Mentor</a>
+        }
+    </div>
+
+    <!-- Filters -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">Category</label>
+                    <select name="category" class="form-select">
+                        <option value="">All Categories</option>
+                        <option value="Music">Music</option>
+                        <option value="Dance">Dance</option>
+                        <option value="Art">Art</option>
+                        <option value="Acting">Acting</option>
+                        <option value="Coding">Coding</option>
+                        <option value="Writing">Writing</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Expertise</label>
+                    <input type="text" name="expertise" class="form-control" placeholder="e.g., Vocal Coaching, Choreography">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Search</label>
+                    <input type="text" name="search" class="form-control" placeholder="Search by name or bio...">
+                </div>
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary">Search</button>
+                    <a href="/Talent/FindMentors" class="btn btn-outline-secondary">Reset</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Mentors Grid -->
+    @if (Model.Count == 0)
+    {
+        <div class="alert alert-info">
+            No mentors found matching your criteria.
+        </div>
+    }
+    else
+    {
+        <div class="row g-4">
+            @foreach (var mentor in Model)
+            {
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <div class="d-flex align-items-start mb-3">
+                                <img src="@(string.IsNullOrEmpty(mentor.User.ProfilePicture) ? "https://via.placeholder.com/60" : mentor.User.ProfilePicture)"
+                                     alt="@mentor.User.Username" class="rounded-circle me-3" width="60" height="60">
+                                <div class="flex-grow-1">
+                                    <h5 class="card-title mb-1">@mentor.Title</h5>
+                                    <p class="text-muted small mb-1">@mentor.User.Username</p>
+                                    <div class="text-warning small">
+                                        @for (int i = 1; i <= 5; i++)
+                                        {
+                                            if (i <= Math.Round(mentor.AverageRating))
+                                            {
+                                                <i class="bi bi-star-fill"></i>
+                                            }
+                                            else
+                                            {
+                                                <i class="bi bi-star"></i>
+                                            }
+                                        }
+                                        <span class="text-muted">(@mentor.TotalReviews)</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="card-text small">@mentor.Bio</p>
+                            @if (!string.IsNullOrEmpty(mentor.ExpertiseAreas))
+                            {
+                                <div class="mb-2">
+                                    @foreach (var area in mentor.ExpertiseAreas.Split(','))
+                                    {
+                                        <span class="badge bg-secondary me-1">@area.Trim()</span>
+                                    }
+                                </div>
+                            }
+                            <div class="d-flex justify-content-between align-items-center mt-3">
+                                <small class="text-muted">
+                                    @if (mentor.HourlyRate > 0)
+                                    {
+                                        <span>$@mentor.HourlyRate/hr</span>
+                                    }
+                                    else
+                                    {
+                                        <span>Free</span>
+                                    }
+                                    <span class="ms-2">@mentor.SessionFormat</span>
+                                </small>
+                                <a href="#" class="btn btn-sm btn-primary">View Profile</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

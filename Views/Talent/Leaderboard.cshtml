@@ -1,0 +1,244 @@
+@model NewTalent.Models.LeaderboardViewModel
+@{
+    ViewData["Title"] = "Leaderboard";
+}
+
+<!-- HERO SECTION -->
+<section class="hero-section text-white">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6 fade-in">
+                <h1 class="display-4 fw-bold">Top Talent Leaderboard</h1>
+                <p class="lead">See who's leading the talent community. Track your progress, compete with others, and climb the ranks to become a top creator.</p>
+                <div class="mt-4">
+                    <a href="#topCreators" class="btn btn-primary me-2">View Rankings</a>
+                    <a href="#topVideos" class="btn btn-outline-primary">Top Videos</a>
+                </div>
+            </div>
+            <div class="col-lg-6 text-center hero-image">
+                <img src="https://images.unsplash.com/photo-1560253023-3ec5d502959f?w=800&h=600&fit=crop" class="img-fluid rounded-4 shadow-lg" alt="Leaderboard" />
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="container py-4" id="topCreators">
+    <h1 class="mb-4">🏆 Leaderboard</h1>
+
+    <!-- Top Creators -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">👥 Top Creators</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>User</th>
+                            <th>Views</th>
+                            <th>Likes</th>
+                            <th>Videos</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var user in Model.TopCreators)
+                        {
+                            <tr class="@(user.IsCurrentUser ? "table-primary" : "")">
+                                <td>
+                                    @if (user.Rank <= 3)
+                                    {
+                                        <span class="badge @(user.Rank == 1 ? "bg-warning" : user.Rank == 2 ? "bg-secondary" : "bg-danger") fs-5">@user.Rank</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">@user.Rank</span>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <img src="@user.ProfilePicture" alt="@user.Username" class="rounded-circle me-2" width="32" height="32">
+                                        <strong>@user.Username</strong>
+                                    </div>
+                                </td>
+                                <td>@user.TotalViews</td>
+                                <td>@user.TotalLikes</td>
+                                <td>@user.TotalVideos</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Videos -->
+    <div class="card mb-4">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0">🎬 Top Videos</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Video</th>
+                            <th>Artist</th>
+                            <th>Views</th>
+                            <th>Likes</th>
+                            <th>Comments</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var video in Model.TopVideos)
+                        {
+                            <tr>
+                                <td>
+                                    @if (video.Rank <= 3)
+                                    {
+                                        <span class="badge @(video.Rank == 1 ? "bg-warning" : video.Rank == 2 ? "bg-secondary" : "bg-danger") fs-5">@video.Rank</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">@video.Rank</span>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <img src="@video.ThumbnailUrl" alt="@video.Title" class="rounded me-2" width="48" height="32">
+                                        <strong>@video.Title</strong>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <img src="@video.ArtistAvatar" alt="@video.ArtistName" class="rounded-circle me-2" width="24" height="24">
+                                        @video.ArtistName
+                                    </div>
+                                </td>
+                                <td>@video.ViewsCount</td>
+                                <td>@video.LikesCount</td>
+                                <td>@video.CommentsCount</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ongoing Contests -->
+    @if (Model.OngoingContests.Any())
+    {
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">🏆 Ongoing Contests</h5>
+            </div>
+            <div class="card-body">
+                @foreach (var contestGroup in Model.OngoingContests.GroupBy(c => c.ContestTitle))
+                {
+                    <div class="mb-4">
+                        <h6 class="mb-3">@contestGroup.Key</h6>
+                        <div class="table-responsive">
+                            <table class="table table-sm table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Rank</th>
+                                        <th>User</th>
+                                        <th>Views</th>
+                                        <th>Likes</th>
+                                        <th>Videos</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var entry in contestGroup.Take(5))
+                                    {
+                                        <tr>
+                                            <td>
+                                                @if (entry.Rank <= 3)
+                                                {
+                                                    <span class="badge @(entry.Rank == 1 ? "bg-warning" : entry.Rank == 2 ? "bg-secondary" : "bg-danger")">@entry.Rank</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-secondary">@entry.Rank</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <img src="@entry.ProfilePicture" alt="@entry.Username" class="rounded-circle me-2" width="24" height="24">
+                                                    <small>@entry.Username</small>
+                                                </div>
+                                            </td>
+                                            <td>@entry.TotalViews</td>
+                                            <td>@entry.TotalLikes</td>
+                                            <td>@entry.TotalVideos</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+
+    <!-- Contest Winners -->
+    @if (Model.ContestWinners.Any())
+    {
+        <div class="card">
+            <div class="card-header bg-warning">
+                <h5 class="mb-0">🏅 Contest Winners</h5>
+            </div>
+            <div class="card-body">
+                @foreach (var contestGroup in Model.ContestWinners.GroupBy(c => c.ContestTitle))
+                {
+                    <div class="mb-4">
+                        <h6 class="mb-3">@contestGroup.Key</h6>
+                        <div class="table-responsive">
+                            <table class="table table-sm table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Rank</th>
+                                        <th>User</th>
+                                        <th>Views</th>
+                                        <th>Likes</th>
+                                        <th>Videos</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var winner in contestGroup.Take(5))
+                                    {
+                                        <tr class="@(winner.IsWinner ? "table-warning" : "")">
+                                            <td>
+                                                @if (winner.Rank <= 3)
+                                                {
+                                                    <span class="badge @(winner.Rank == 1 ? "bg-warning" : winner.Rank == 2 ? "bg-secondary" : "bg-danger")">@winner.Rank</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-secondary">@winner.Rank</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <img src="@winner.ProfilePicture" alt="@winner.Username" class="rounded-circle me-2" width="24" height="24">
+                                                    <small>@winner.Username</small>
+                                                </div>
+                                            </td>
+                                            <td>@winner.TotalViews</td>
+                                            <td>@winner.TotalLikes</td>
+                                            <td>@winner.TotalVideos</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>

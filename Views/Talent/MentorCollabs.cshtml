@@ -1,0 +1,251 @@
+@model NewTalent.Models.MentorCollabsViewModel
+@{
+    ViewData["Title"] = "Mentorship & Collabs";
+}
+
+<!-- HERO SECTION -->
+<section class="hero-section text-white">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6 fade-in">
+                <h1 class="display-4 fw-bold">Mentorship & Collaborations</h1>
+                <p class="lead">Connect with experienced mentors to grow your skills, or collaborate with fellow creators to produce amazing content. Learn, share, and create together.</p>
+                <div class="mt-4">
+                    @if (Model.IsLoggedIn)
+                    {
+                        <a href="/Talent/BecomeAMentor" class="btn btn-primary me-2">Become a Mentor</a>
+                        <a href="/Talent/CreateCollaboration" class="btn btn-outline-primary">Create Collaboration</a>
+                    }
+                    else
+                    {
+                        <a href="/Talent/Login" class="btn btn-primary me-2">Login to Get Started</a>
+                    }
+                </div>
+            </div>
+            <div class="col-lg-6 text-center hero-image">
+                <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&h=600&fit=crop" class="img-fluid rounded-4 shadow-lg" alt="Mentorship & Collabs" />
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>🎓 Mentorship & Collabs</h1>
+        @if (Model.IsLoggedIn)
+        {
+            <div class="btn-group">
+                <a href="/Talent/BecomeAMentor" class="btn btn-primary">Become a Mentor</a>
+                <a href="/Talent/CreateCollaboration" class="btn btn-outline-secondary">Create Collaboration</a>
+                <a href="/Talent/MyCollaborations" class="btn btn-outline-secondary">My Collaborations</a>
+                <a href="/Talent/MyCollaborationApplications" class="btn btn-outline-secondary">My Applications</a>
+                <a href="/Talent/MySessions" class="btn btn-outline-secondary">My Sessions</a>
+            </div>
+        }
+    </div>
+
+    <!-- Tabs -->
+    <ul class="nav nav-tabs mb-4" id="mentorCollabsTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="mentors-tab" data-bs-toggle="tab" data-bs-target="#mentors" type="button" role="tab">
+                <i class="bi bi-person-workspace"></i> Mentors
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="collabs-tab" data-bs-toggle="tab" data-bs-target="#collabs" type="button" role="tab">
+                <i class="bi bi-handshake"></i> Collaborations
+            </button>
+        </li>
+    </ul>
+
+    <!-- Tab Content -->
+    <div class="tab-content" id="mentorCollabsTabsContent">
+        <!-- Mentors Tab -->
+        <div class="tab-pane fade show active" id="mentors" role="tabpanel">
+            <!-- Filters -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Category</label>
+                            <select name="category" class="form-select">
+                                <option value="">All Categories</option>
+                                <option value="Music" selected="@(Model.CategoryFilter == "Music")">Music</option>
+                                <option value="Dance" selected="@(Model.CategoryFilter == "Dance")">Dance</option>
+                                <option value="Art" selected="@(Model.CategoryFilter == "Art")">Art</option>
+                                <option value="Acting" selected="@(Model.CategoryFilter == "Acting")">Acting</option>
+                                <option value="Coding" selected="@(Model.CategoryFilter == "Coding")">Coding</option>
+                                <option value="Writing" selected="@(Model.CategoryFilter == "Writing")">Writing</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Expertise</label>
+                            <input type="text" name="expertise" class="form-control" placeholder="e.g., Vocal Coaching, Choreography" value="@(Model.ExpertiseFilter ?? "")">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Search</label>
+                            <input type="text" name="search" class="form-control" placeholder="Search by name or bio..." value="@(Model.SearchQuery ?? "")">
+                        </div>
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary">Search</button>
+                            <a href="/Talent/MentorCollabs" class="btn btn-outline-secondary">Reset</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Mentors Grid -->
+            @if (Model.Mentors.Count == 0)
+            {
+                <div class="alert alert-info">
+                    No mentors found matching your criteria.
+                </div>
+            }
+            else
+            {
+                <div class="row g-4">
+                    @foreach (var mentor in Model.Mentors)
+                    {
+                        <div class="col-md-6 col-lg-4">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-start mb-3">
+                                        <img src="@(string.IsNullOrEmpty(mentor.User.ProfilePicture) ? "https://ui-avatars.com/api/?name=" + Uri.EscapeDataString(mentor.User.Username) + "&background=random" : mentor.User.ProfilePicture)"
+                                             alt="@mentor.User.Username" class="rounded-circle me-3" width="60" height="60">
+                                        <div class="flex-grow-1">
+                                            <h5 class="card-title mb-1">@mentor.Title</h5>
+                                            <p class="text-muted small mb-1">@mentor.User.Username</p>
+                                            <div class="text-warning small">
+                                                @for (int i = 1; i <= 5; i++)
+                                                {
+                                                    if (i <= Math.Round(mentor.AverageRating))
+                                                    {
+                                                        <i class="bi bi-star-fill"></i>
+                                                    }
+                                                    else
+                                                    {
+                                                        <i class="bi bi-star"></i>
+                                                    }
+                                                }
+                                                <span class="text-muted">(@mentor.TotalReviews)</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <p class="card-text small">@mentor.Bio</p>
+                                    @if (!string.IsNullOrEmpty(mentor.ExpertiseAreas))
+                                    {
+                                        <div class="mb-2">
+                                            @foreach (var area in mentor.ExpertiseAreas.Split(','))
+                                            {
+                                                <span class="badge bg-secondary me-1">@area.Trim()</span>
+                                            }
+                                        </div>
+                                    }
+                                    <div class="d-flex justify-content-between align-items-center mt-3">
+                                        <small class="text-muted">
+                                            @if (mentor.HourlyRate > 0)
+                                            {
+                                                <span>$@mentor.HourlyRate/hr</span>
+                                            }
+                                            else
+                                            {
+                                                <span>Free</span>
+                                            }
+                                            <span class="ms-2">@mentor.SessionFormat</span>
+                                        </small>
+                                        <a href="#" class="btn btn-sm btn-primary">View Profile</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+
+        <!-- Collaborations Tab -->
+        <div class="tab-pane fade" id="collabs" role="tabpanel">
+            <!-- Filters -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label">Category</label>
+                            <select name="category" class="form-select">
+                                <option value="">All Categories</option>
+                                <option value="Music" selected="@(Model.CategoryFilter == "Music")">Music</option>
+                                <option value="Dance" selected="@(Model.CategoryFilter == "Dance")">Dance</option>
+                                <option value="Art" selected="@(Model.CategoryFilter == "Art")">Art</option>
+                                <option value="Acting" selected="@(Model.CategoryFilter == "Acting")">Acting</option>
+                                <option value="Coding" selected="@(Model.CategoryFilter == "Coding")">Coding</option>
+                                <option value="Writing" selected="@(Model.CategoryFilter == "Writing")">Writing</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Project Type</label>
+                            <select name="projectType" class="form-select">
+                                <option value="">All Types</option>
+                                <option value="joint_performance" selected="@(Model.ProjectTypeFilter == "joint_performance")">Joint Performance</option>
+                                <option value="contest" selected="@(Model.ProjectTypeFilter == "contest")">Contest</option>
+                                <option value="creative_project" selected="@(Model.ProjectTypeFilter == "creative_project")">Creative Project</option>
+                                <option value="other" selected="@(Model.ProjectTypeFilter == "other")">Other</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Search</label>
+                            <input type="text" name="search" class="form-control" placeholder="Search by title, description, or skills..." value="@(Model.SearchQuery ?? "")">
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary w-100">Search</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Collaborations Grid -->
+            @if (Model.Collaborations.Count == 0)
+            {
+                <div class="alert alert-info">
+                    No collaborations found matching your criteria.
+                </div>
+            }
+            else
+            {
+                <div class="row g-4">
+                    @foreach (var collab in Model.Collaborations)
+                    {
+                        <div class="col-md-6 col-lg-4">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <span class="badge bg-primary">@collab.Category</span>
+                                        <span class="badge bg-secondary">@collab.ProjectType</span>
+                                    </div>
+                                    <h5 class="card-title">@collab.Title</h5>
+                                    <p class="card-text small text-truncate">@collab.Description</p>
+                                    <div class="mb-2">
+                                        <small class="text-muted">
+                                            <strong>Creator:</strong> @collab.Creator.Username<br>
+                                            <strong>Participants:</strong> @collab.Participants.Count / @collab.MaxParticipants<br>
+                                            <strong>Deadline:</strong> @collab.Deadline.ToString("MMM dd, yyyy")
+                                        </small>
+                                    </div>
+                                    @if (!string.IsNullOrEmpty(collab.RequiredSkills))
+                                    {
+                                        <div class="mb-2">
+                                            @foreach (var skill in collab.RequiredSkills.Split(',').Take(3))
+                                            {
+                                                <span class="badge bg-light text-dark me-1">@skill.Trim()</span>
+                                            }
+                                        </div>
+                                    }
+                                    <a href="#" class="btn btn-sm btn-primary w-100">View Details</a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>

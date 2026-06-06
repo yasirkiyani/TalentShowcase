@@ -1,0 +1,313 @@
+﻿@model NewTalent.Models.IndexViewModel
+
+<!-- HERO SECTION -->
+<section class="hero-section text-white">
+    <div class="container">
+        <div class="row align-items-center">
+
+            <div class="col-lg-6 fade-in">
+                <h1 class="display-4 fw-bold">@Model.HeroTitle</h1>
+                <p class="lead">@Model.HeroSubtitle</p>
+
+                <div class="mt-4">
+                    <a href="/Talent/Upload" class="btn btn-primary me-2">Upload Talent</a>
+                    <a href="/Talent/Explore" class="btn btn-outline-primary">Explore</a>
+                </div>
+            </div>
+
+            <div class="col-lg-6 text-center hero-image">
+                <img src="https://images.unsplash.com/photo-1516280440614-6697288d5d38?w=800&h=600&fit=crop" class="img-fluid rounded-4 shadow-lg" alt="Talent Showcase" />
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- STATS -->
+<section class="py-5">
+    <div class="container">
+        <div class="row text-center">
+
+            <div class="col-md-4">
+                <div class="stat-item">
+                    <div class="h3">@Model.TotalArtists</div>
+                    <p>Artists</p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="stat-item">
+                    <div class="h3">@Model.TotalVideos</div>
+                    <p>Videos</p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="stat-item">
+                    <div class="h3">@Model.TotalCommunities</div>
+                    <p>Communities</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- VIDEO FEED (Instagram-style grid) -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <h2 class="mb-4">📱 Video Feed</h2>
+
+        <div class="row">
+            @foreach (var video in Model.TrendingVideos)
+            {
+                <div class="col-md-3 mb-4">
+                    <div class="card talent-card h-100">
+                        <div class="card-body">
+                            <!-- User info -->
+                            <div class="d-flex align-items-center mb-2">
+                                <img src="@(string.IsNullOrEmpty(video.ArtistProfilePicture) ? "https://ui-avatars.com/api/?name=" + Uri.EscapeDataString(video.ArtistName) + "&background=random" : video.ArtistProfilePicture)"
+                                     alt="@video.ArtistName" class="rounded-circle me-2" width="30" height="30">
+                                <div class="flex-grow-1">
+                                    <strong class="small">@video.ArtistName</strong>
+                                    <p class="text-muted small mb-0">@video.UploadedAgo</p>
+                                </div>
+                            </div>
+
+                            <!-- Video -->
+                            <div class="position-relative mb-2">
+                                <video class="w-100 rounded" poster="@video.ThumbnailUrl" style="max-height: 200px; cursor: pointer;" onclick="openVideoModal(@video.Id, '@video.VideoUrl', '@video.Title', '@video.Description', '@video.ArtistName', '@(string.IsNullOrEmpty(video.ArtistProfilePicture) ? "https://ui-avatars.com/api/?name=" + Uri.EscapeDataString(video.ArtistName) + "&background=random" : video.ArtistProfilePicture)', @video.LikesCount, '@video.UploadedAgo')">
+                                    <source src="@video.VideoUrl" type="video/mp4">
+                                    Your browser does not support the video tag.
+                                </video>
+                            </div>
+
+                            <!-- Instagram-style action buttons -->
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-link p-0 @(video.IsLikedByCurrentUser ? "text-danger" : "text-dark")" onclick="handleAction(event, 'like', @video.Id)">
+                                        <i class="bi bi-heart fs-5"></i>
+                                    </button>
+                                    <button class="btn btn-link p-0 text-dark" onclick="handleAction(event, 'comment', @video.Id)">
+                                        <i class="bi bi-chat fs-5"></i>
+                                    </button>
+                                    <button class="btn btn-link p-0 text-dark" onclick="handleAction(event, 'share', @video.Id)">
+                                        <i class="bi bi-send fs-5"></i>
+                                    </button>
+                                </div>
+                                <button class="btn btn-link p-0 @(video.IsSavedByCurrentUser ? "text-warning" : "text-dark")">
+                                    <i class="bi bi-bookmark fs-5"></i>
+                                </button>
+                            </div>
+
+                            <!-- Engagement counts -->
+                            <div class="mb-1">
+                                <strong class="small">@video.LikesCount likes</strong>
+                            </div>
+
+                            <!-- Caption -->
+                            <div class="mb-1">
+                                <strong class="small">@video.ArtistName</strong> <span class="small text-muted">@(video.Description.Length > 50 ? video.Description.Substring(0, 50) + "..." : video.Description)</span>
+                            </div>
+
+                            <!-- Timestamp -->
+                            <div class="text-muted small">
+                                @video.UploadedAgo
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+    </div>
+</section>
+
+<!-- FEATURED ARTISTS -->
+<section class="py-5">
+    <div class="container">
+
+        <h2 class="mb-4">🎤 Featured Artists</h2>
+
+        @if (Model.FeaturedArtists != null && Model.FeaturedArtists.Any())
+        {
+            <div class="row">
+                @foreach (var artist in Model.FeaturedArtists)
+                {
+                    <div class="col-md-3 mb-4">
+                        <div class="card talent-card text-center p-3">
+
+                            <img src="@(string.IsNullOrEmpty(artist.ProfilePicture)
+                                                                             ? "/images/default.png"
+                                                                             : artist.ProfilePicture)"
+                                 class="profile-pic mx-auto" />
+
+                            <h5 class="mt-3">@artist.FullName</h5>
+
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+
+    </div>
+</section>
+
+<!-- CATEGORIES -->
+<section class="py-5 bg-light">
+    <div class="container">
+
+        <h2 class="mb-4">📂 Categories</h2>
+
+        <div class="row">
+            @foreach (var cat in Model.Categories)
+            {
+                <div class="col-md-3 mb-4">
+                    <div class="category-card text-center p-3">
+
+                        <i class="@cat.IconClass fa-2x mb-2"></i>
+                        <h5>@cat.Name</h5>
+                        <p>@cat.VideoCount Videos</p>
+
+                    </div>
+                </div>
+            }
+        </div>
+
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        // Handle like/comment/share actions
+        function handleAction(event, action, videoId) {
+            event.preventDefault();
+
+            // Check if user is logged in
+            var userEmail = '@Context.Session.GetString("UserEmail")';
+            if (!userEmail || userEmail === '') {
+                alert('Please login or register first to perform this action');
+                window.location.href = '/Talent/Login';
+                return;
+            }
+
+            // Perform the action
+            if (action === 'like') {
+                fetch('/Talent/LikeVideo', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: 'videoId=' + videoId
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        location.reload();
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            } else if (action === 'comment') {
+                var comment = prompt('Enter your comment:');
+                if (comment) {
+                    fetch('/Talent/CommentVideo', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: 'videoId=' + videoId + '&content=' + encodeURIComponent(comment)
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert(data.message);
+                            location.reload();
+                        } else {
+                            alert(data.message);
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+                }
+            } else if (action === 'share') {
+                fetch('/Talent/ShareVideo', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: 'videoId=' + videoId
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            }
+        }
+
+        // Open video modal when clicking on video
+        function openVideoModal(videoId, videoUrl, title, description, artistName, artistPic, likesCount, uploadedAgo) {
+            const modal = new bootstrap.Modal(document.getElementById('videoModal'));
+            document.getElementById('modalVideo').src = videoUrl;
+            document.getElementById('modalArtistName').textContent = artistName;
+            document.getElementById('modalArtistUsername').textContent = '@@' + artistName;
+            document.getElementById('modalArtistPic').src = artistPic || 'https://via.placeholder.com/40';
+            document.getElementById('modalDescription').textContent = description;
+            document.getElementById('modalLikesCount').textContent = likesCount;
+            document.getElementById('modalTimestamp').textContent = uploadedAgo;
+
+            // Clear comments container
+            const commentsContainer = document.getElementById('modalComments');
+            commentsContainer.innerHTML = '<p class="text-muted small">Loading comments...</p>';
+
+            // Fetch comments via AJAX
+            fetch('/Talent/GetVideoComments?videoId=' + videoId)
+                .then(response => response.json())
+                .then(data => {
+                    commentsContainer.innerHTML = '';
+                    if (data && data.length > 0) {
+                        data.forEach(function(comment) {
+                            const commentHtml = `
+                                <div class="d-flex mb-3">
+                                    <img src="${comment.userAvatar || 'https://via.placeholder.com/32'}"
+                                         alt="${comment.userName}" class="rounded-circle me-2" width="32" height="32">
+                                    <div class="flex-grow-1">
+                                        <div class="small">
+                                            <strong>${comment.userName}</strong>
+                                            <span class="text-muted ms-1">${comment.createdAgo}</span>
+                                        </div>
+                                        <div class="small text-muted">${comment.content}</div>
+                                    </div>
+                                </div>
+                            `;
+                            commentsContainer.innerHTML += commentHtml;
+                        });
+                    } else {
+                        commentsContainer.innerHTML = '<p class="text-muted small">No comments yet. Be the first to comment!</p>';
+                    }
+                })
+                .catch(error => {
+                    commentsContainer.innerHTML = '<p class="text-muted small">Failed to load comments.</p>';
+                });
+
+            // Set up modal action buttons
+            document.getElementById('modalLikeBtn').onclick = function(e) {
+                handleAction(e, 'like', videoId);
+            };
+            document.getElementById('modalCommentBtn').onclick = function(e) {
+                handleAction(e, 'comment', videoId);
+            };
+            document.getElementById('modalShareBtn').onclick = function(e) {
+                handleAction(e, 'share', videoId);
+            };
+
+            modal.show();
+        }
+    </script>
+}

@@ -1,0 +1,324 @@
+@{
+    ViewData["Title"] = "Analytics Dashboard";
+}
+
+<style>
+    /* Advanced Card Styling */
+    .analytics-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .analytics-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .analytics-card:hover {
+        transform: translateY(-10px) scale(1.02);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    }
+
+    .analytics-card:hover::before {
+        opacity: 1;
+    }
+
+    .analytics-card .card-body {
+        position: relative;
+        z-index: 1;
+    }
+
+    .analytics-card h3 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        transition: transform 0.3s ease;
+    }
+
+    .analytics-card:hover h3 {
+        transform: scale(1.1);
+    }
+
+    /* Card Color Variations */
+    .card-views {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .card-likes {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+
+    .card-comments {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    }
+
+    .card-videos {
+        background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    }
+
+    /* 3D Icon Styling */
+    .icon-3d {
+        font-size: 3rem;
+        text-shadow: 
+            1px 1px 0 #fff,
+            2px 2px 0 #fff,
+            3px 3px 0 #fff,
+            4px 4px 0 rgba(0,0,0,0.1),
+            5px 5px 0 rgba(0,0,0,0.1),
+            6px 6px 0 rgba(0,0,0,0.1);
+        animation: float 3s ease-in-out infinite;
+    }
+
+    @@keyframes float {
+        0%, 100% {
+            transform: translateY(0px) rotate(0deg);
+        }
+        50% {
+            transform: translateY(-10px) rotate(5deg);
+        }
+    }
+
+    /* Table Styling */
+    .table-analytics {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .table-analytics:hover {
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .table-analytics thead {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .table-analytics tbody tr {
+        transition: all 0.3s ease;
+    }
+
+    .table-analytics tbody tr:hover {
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+        transform: scale(1.01);
+    }
+
+    /* Button Styling */
+    .btn-analytics {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        border-radius: 25px;
+        padding: 10px 25px;
+        color: white;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-analytics:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-analytics:active {
+        transform: translateY(-1px);
+    }
+
+    /* Section Styling */
+    .analytics-section {
+        background: white;
+        border-radius: 20px;
+        padding: 25px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .analytics-section:hover {
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Header Styling */
+    .analytics-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-weight: 800;
+        animation: gradientShift 5s ease infinite;
+        background-size: 200% 200%;
+    }
+
+    @@keyframes gradientShift {
+        0% {
+            background-position: 0% 50%;
+        }
+        50% {
+            background-position: 100% 50%;
+        }
+        100% {
+            background-position: 0% 50%;
+        }
+    }
+
+    /* Pulse Animation */
+    .pulse {
+        animation: pulse 2s infinite;
+    }
+
+    @@keyframes pulse {
+        0% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.05);
+        }
+        100% {
+            transform: scale(1);
+        }
+    }
+
+    /* Glassmorphism Effect */
+    .glass {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 15px;
+    }
+</style>
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="analytics-header">📊 Analytics Dashboard</h1>
+        <div class="btn-group">
+            <a href="/Talent/Analytics" class="btn btn-analytics">Audience Demographics</a>
+            <a href="/Talent/Analytics" class="btn btn-analytics">Performance Insights</a>
+        </div>
+    </div>
+
+    <!-- Overview Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="card analytics-card card-views text-center">
+                <div class="card-body">
+                    <div class="icon-3d mb-2">👁️</div>
+                    <h3 class="text-white">@ViewBag.TotalViews</h3>
+                    <p class="text-white mb-0">Total Views</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card analytics-card card-likes text-center">
+                <div class="card-body">
+                    <div class="icon-3d mb-2">❤️</div>
+                    <h3 class="text-white">@ViewBag.TotalLikes</h3>
+                    <p class="text-white mb-0">Total Likes</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card analytics-card card-comments text-center">
+                <div class="card-body">
+                    <div class="icon-3d mb-2">💬</div>
+                    <h3 class="text-white">@ViewBag.TotalComments</h3>
+                    <p class="text-white mb-0">Total Comments</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card analytics-card card-videos text-center">
+                <div class="card-body">
+                    <div class="icon-3d mb-2">🎬</div>
+                    <h3 class="text-white">@ViewBag.TotalVideos</h3>
+                    <p class="text-white mb-0">Total Videos</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Analytics -->
+    @if (ViewBag.UserAnalytics != null)
+    {
+        var userAnalytics = ViewBag.UserAnalytics as NewTalent.Data.Entities.UserAnalytics;
+        <div class="analytics-section mb-4">
+            <div class="card-header">
+                <h5 class="analytics-header">User Analytics</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <h6 class="analytics-header">Follower Metrics</h6>
+                        <p><strong>Total Followers:</strong> @userAnalytics.TotalFollowers</p>
+                        <p><strong>New This Week:</strong> @userAnalytics.NewFollowersThisWeek</p>
+                        <p><strong>New This Month:</strong> @userAnalytics.NewFollowersThisMonth</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="analytics-header">Engagement Metrics</h6>
+                        <p><strong>Average Engagement Rate:</strong> @userAnalytics.AverageEngagementRate.ToString("F2")%</p>
+                        <p><strong>Average Watch Time:</strong> @userAnalytics.AverageViewDuration.ToString("F2")s</p>
+                        <p><strong>Total Watch Time:</strong> @userAnalytics.TotalWatchTime s</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Top Performing Videos -->
+    <div class="analytics-section">
+        <div class="card-header">
+            <h5 class="analytics-header">Top Performing Videos</h5>
+        </div>
+        <div class="card-body">
+            @if (ViewBag.VideoAnalytics != null && ((List<NewTalent.Data.Entities.VideoAnalytics>)ViewBag.VideoAnalytics).Count > 0)
+            {
+                var videoAnalytics = ViewBag.VideoAnalytics as List<NewTalent.Data.Entities.VideoAnalytics>;
+                <div class="table-responsive">
+                    <table class="table table-analytics table-hover">
+                        <thead>
+                            <tr>
+                                <th>Video</th>
+                                <th>Views</th>
+                                <th>Likes</th>
+                                <th>Comments</th>
+                                <th>Shares</th>
+                                <th>Avg Rating</th>
+                                <th>Completion Rate</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var va in videoAnalytics.Take(10))
+                            {
+                                <tr>
+                                    <td>@va.Video.Title</td>
+                                    <td>@va.TotalViews</td>
+                                    <td>@va.TotalLikes</td>
+                                    <td>@va.TotalComments</td>
+                                    <td>@va.TotalShares</td>
+                                    <td>@va.AverageRating.ToString("F1")</td>
+                                    <td>@va.CompletionRate.ToString("F1")%</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <p class="text-muted">No analytics data available yet.</p>
+            }
+        </div>
+    </div>
+</div>

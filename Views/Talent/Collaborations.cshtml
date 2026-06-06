@@ -1,0 +1,101 @@
+@model List<NewTalent.Data.Entities.Collaboration>
+@{
+    ViewData["Title"] = "Collaborations";
+    var isLoggedIn = Context.Session.GetString("UserEmail") != null;
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>🤝 Collaborations</h1>
+        @if (isLoggedIn)
+        {
+            <div class="btn-group">
+                <a href="/Talent/Collaborations" class="btn btn-primary">Create Collaboration</a>
+                <a href="/Talent/MyCollaborations" class="btn btn-outline-secondary">My Collaborations</a>
+                <a href="/Talent/MyApplications" class="btn btn-outline-secondary">My Applications</a>
+            </div>
+        }
+    </div>
+
+    <!-- Filters -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label">Category</label>
+                    <select name="category" class="form-select">
+                        <option value="">All Categories</option>
+                        <option value="Music">Music</option>
+                        <option value="Dance">Dance</option>
+                        <option value="Art">Art</option>
+                        <option value="Acting">Acting</option>
+                        <option value="Coding">Coding</option>
+                        <option value="Writing">Writing</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Project Type</label>
+                    <select name="projectType" class="form-select">
+                        <option value="">All Types</option>
+                        <option value="joint_performance">Joint Performance</option>
+                        <option value="contest">Contest</option>
+                        <option value="creative_project">Creative Project</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Search</label>
+                    <input type="text" name="search" class="form-control" placeholder="Search by title, description, or skills...">
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">Search</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Collaborations Grid -->
+    @if (Model.Count == 0)
+    {
+        <div class="alert alert-info">
+            No collaborations found matching your criteria.
+        </div>
+    }
+    else
+    {
+        <div class="row g-4">
+            @foreach (var collab in Model)
+            {
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <span class="badge bg-primary">@collab.Category</span>
+                                <span class="badge bg-secondary">@collab.ProjectType</span>
+                            </div>
+                            <h5 class="card-title">@collab.Title</h5>
+                            <p class="card-text small text-truncate">@collab.Description</p>
+                            <div class="mb-2">
+                                <small class="text-muted">
+                                    <strong>Creator:</strong> @collab.Creator.Username<br>
+                                    <strong>Participants:</strong> @collab.Participants.Count / @collab.MaxParticipants<br>
+                                    <strong>Deadline:</strong> @collab.Deadline.ToString("MMM dd, yyyy")
+                                </small>
+                            </div>
+                            @if (!string.IsNullOrEmpty(collab.RequiredSkills))
+                            {
+                                <div class="mb-2">
+                                    @foreach (var skill in collab.RequiredSkills.Split(',').Take(3))
+                                    {
+                                        <span class="badge bg-light text-dark me-1">@skill.Trim()</span>
+                                    }
+                                </div>
+                            }
+                            <a href="#" class="btn btn-sm btn-primary w-100">View Details</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
